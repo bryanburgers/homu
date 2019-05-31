@@ -12,7 +12,7 @@ setup(
     packages=['homu'],
     install_requires=[
         'github3.py==0.9.6',
-        'uritemplate.py>=0.2.0',
+        # 'uritemplate.py<3.0.0',
         'toml',
         'Jinja2',
         'requests',
