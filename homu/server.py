@@ -965,6 +965,10 @@ def start(cfg, states, queue_handler, repo_cfgs, repos, logger,
     if cfg['web'].get('sync_on_start', False):
         Thread(target=synch_all).start()
 
+    # Testing!
+    from .resynchronize_thread import resynchronize_thread
+    Thread(target=resynchronize_thread, args=[g]).start()
+
     try:
         run(host=cfg['web'].get('host', '0.0.0.0'),
             port=cfg['web']['port'],

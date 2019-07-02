@@ -33,7 +33,7 @@ from .git_helper import SSH_KEY_FILE
 import shlex
 import random
 from .pull_req_state import PullReqState
-from .pull_request_events import all as all_pull_request_events
+from .github_v4 import GitHubV4
 
 global_cfg = {}
 
@@ -1152,6 +1152,7 @@ def synchronize(repo_label, repo_cfg, logger, gh, states, repos, db, mergeable_q
     logger.info('Synchronizing {}...'.format(repo_label))
 
     repo = gh.repository(repo_cfg['owner'], repo_cfg['name'])
+    ghv4 = gh.v4
 
     db.execute('DELETE FROM pull WHERE repo = ?', [repo_label])
     db.execute('DELETE FROM build_res WHERE repo = ?', [repo_label])
@@ -1189,9 +1190,9 @@ def synchronize(repo_label, repo_cfg, logger, gh, states, repos, db, mergeable_q
 #            continue
 
         print("{}/{}#{}".format(repo_cfg['owner'], repo_cfg['name'], pull.number))
-        access_token = global_cfg['github']['access_token']
+        #access_token = global_cfg['github']['access_token']
         try:
-            response = all_pull_request_events(access_token, repo_cfg['owner'], repo_cfg['name'], pull.number)
+            response = ghv4.pull_request(repo_cfg['owner'], repo_cfg['name'], pull.number)
         except:
             continue
         status = ''
@@ -1299,6 +1300,7 @@ def main():
     global_cfg = cfg
 
     gh = github3.login(token=cfg['github']['access_token'])
+    gh.v4 = GitHubV4(cfg['github']['access_token'])
     user = gh.user()
     cfg_git = cfg.get('git', {})
     user_email = cfg_git.get('email')
